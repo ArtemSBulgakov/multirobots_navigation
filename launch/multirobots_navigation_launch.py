@@ -8,6 +8,7 @@ from launch.actions import (DeclareLaunchArgument, ExecuteProcess, GroupAction,
 from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, TextSubstitution
+from launch_ros.actions import Node
 
 
 def generate_launch_description():
@@ -67,7 +68,7 @@ def generate_launch_description():
 
     declare_rviz_config_file_cmd = DeclareLaunchArgument(
         'rviz_config',
-        default_value=os.path.join(bringup_dir, 'rviz', 'nav2_namespaced_view.rviz'),
+        default_value=os.path.join(bringup_dir, 'rviz', 'all_robots.rviz'),
         description='Full path to the RVIZ config file to use.')
 
     declare_use_robot_state_pub_cmd = DeclareLaunchArgument(
@@ -86,20 +87,27 @@ def generate_launch_description():
                                      '-s', 'libgazebo_ros_factory.so', world],
         output='screen')
 
+    # Rviz for all robots
+    rviz_cmd = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(launch_dir, 'rviz_launch.py')),
+        condition=IfCondition(use_rviz),
+        launch_arguments={'rviz_config': rviz_config_file}.items())
+
     # Define commands for launching the navigation instances
     nav_instances_cmds = []
     for robot in robots:
         params_file = LaunchConfiguration(f"{robot['name']}_params_file")
 
         group = GroupAction([
-            IncludeLaunchDescription(
-                PythonLaunchDescriptionSource(
-                        os.path.join(launch_dir, 'rviz_launch.py')),
-                condition=IfCondition(use_rviz),
-                launch_arguments={
-                                  'namespace': TextSubstitution(text=robot['name']),
-                                  'use_namespace': 'True',
-                                  'rviz_config': rviz_config_file}.items()),
+            # IncludeLaunchDescription(
+            #     PythonLaunchDescriptionSource(
+            #             os.path.join(launch_dir, 'rviz_launch.py')),
+            #     condition=IfCondition(use_rviz),
+            #     launch_arguments={
+            #                       'namespace': TextSubstitution(text=robot['name']),
+            #                       'use_namespace': 'True',
+            #                       'rviz_config': rviz_config_file}.items()),
 
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(os.path.join(bringup_dir,
@@ -149,6 +157,44 @@ def generate_launch_description():
     # Create the launch description and populate
     ld = LaunchDescription()
 
+
+    ld.add_action(Node(
+        package="multirobots_navigation",
+        executable="remapper.py",
+        output="screen" ,
+    ))
+    ld.add_action(Node(
+        package="tf2_ros",
+        executable="static_transform_publisher",
+        output="screen" ,
+        arguments=["--frame-id", "map", "--child-frame-id", "robot1/map", "--x", "0", "--y", "0", "--z", "0", "--roll", "0", "--pitch", "0", "--yaw", "0"]
+    ))
+    ld.add_action(Node(
+        package="tf2_ros",
+        executable="static_transform_publisher",
+        output="screen" ,
+        arguments=["--frame-id", "map", "--child-frame-id", "robot2/map", "--x", "0", "--y", "0", "--z", "0", "--roll", "0", "--pitch", "0", "--yaw", "0"]
+    ))
+    ld.add_action(Node(
+        package="tf2_ros",
+        executable="static_transform_publisher",
+        output="screen" ,
+        arguments=["--frame-id", "robot1/map", "--child-frame-id", "robot1/odom", "--x", "0", "--y", "0", "--z", "0", "--roll", "0", "--pitch", "0", "--yaw", "0"]
+    ))
+    ld.add_action(Node(
+        package="tf2_ros",
+        executable="static_transform_publisher",
+        output="screen" ,
+        arguments=["--frame-id", "robot2/map", "--child-frame-id", "robot2/odom", "--x", "0", "--y", "0", "--z", "0", "--roll", "0", "--pitch", "0", "--yaw", "0"]
+    ))
+    ld.add_action(Node(
+        package="tf2_ros",
+        executable="static_transform_publisher",
+        output="screen" ,
+        arguments=["--frame-id", "map", "--child-frame-id", "odom", "--x", "0", "--y", "0", "--z", "0", "--roll", "0", "--pitch", "0", "--yaw", "0"]
+    ))
+
+
     # Declare the launch options
     ld.add_action(declare_simulator_cmd)
     ld.add_action(declare_world_cmd)
@@ -162,6 +208,7 @@ def generate_launch_description():
 
     # Add the actions to start gazebo, robots and simulations
     ld.add_action(start_gazebo_cmd)
+    ld.add_action(rviz_cmd)
 
     for simulation_instance_cmd in nav_instances_cmds:
         ld.add_action(simulation_instance_cmd)

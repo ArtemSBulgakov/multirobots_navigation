@@ -6,7 +6,7 @@ amcl:
     alpha3: 0.2
     alpha4: 0.2
     alpha5: 0.2
-    base_frame_id: "base_footprint"
+    base_frame_id: "robot2/base_footprint"
     beam_skip_distance: 0.5
     beam_skip_error_threshold: 0.9
     beam_skip_threshold: 0.3
@@ -43,8 +43,8 @@ bt_navigator:
   ros__parameters:
     use_sim_time: True
     global_frame: map
-    robot_base_frame: base_link
-    odom_topic: /odom
+    robot_base_frame: robot2/base_link
+    odom_topic: /robot2/odom
     bt_loop_duration: 10
     default_server_timeout: 20
     # 'default_nav_through_poses_bt_xml' and 'default_nav_to_pose_bt_xml' are use defaults:
@@ -174,7 +174,8 @@ local_costmap:
   local_costmap:
     ros__parameters:
       use_sim_time: True
-      global_frame: odom
+      robot_base_frame: robot2/base_link
+      global_frame: robot2/odom
       rolling_window: true
       width: 3
       height: 3
@@ -212,6 +213,7 @@ global_costmap:
   global_costmap:
     ros__parameters:
       use_sim_time: True
+      robot_base_frame: robot2/base_link
       robot_radius: 0.22
       plugins: ["static_layer", "obstacle_layer", "inflation_layer"]
       obstacle_layer:
@@ -272,7 +274,7 @@ behavior_server:
     wait:
       plugin: "nav2_behaviors/Wait"
     global_frame: odom
-    robot_base_frame: base_link
+    robot_base_frame: robot2/base_link
     transform_tolerance: 0.1
     use_sim_time: true
     simulate_ahead_time: 2.0

@@ -8,6 +8,8 @@
   <license>TODO</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_python</buildtool_depend>
+
   <build_depend>nav2_common</build_depend>
 
   <build_depend>navigation2</build_depend>
@@ -18,6 +20,9 @@
   <exec_depend>nav2_common</exec_depend>
   <exec_depend>slam_toolbox</exec_depend>
   <exec_depend>turtlebot3_gazebo</exec_depend>
+
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>tf2_msgs</exec_depend>
 
   <test_depend>ament_lint_common</test_depend>
   <test_depend>ament_lint_auto</test_depend>

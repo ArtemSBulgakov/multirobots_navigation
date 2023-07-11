@@ -64,8 +64,8 @@ def generate_launch_description():
     # https://github.com/ros/robot_state_publisher/pull/30
     # TODO(orduno) Substitute with `PushNodeRemapping`
     #              https://github.com/ros2/launch_ros/issues/56
-    remappings = [('/tf', 'tf'),
-                  ('/tf_static', 'tf_static')]
+    remappings = []#[('/tf', 'tf'),
+                  #('/tf_static', 'tf_static')]
 
     # Declare the launch arguments
     declare_namespace_cmd = DeclareLaunchArgument(
@@ -181,8 +181,10 @@ def generate_launch_description():
         namespace=namespace,
         output='screen',
         parameters=[{'use_sim_time': use_sim_time,
-                     'robot_description': robot_description}],
-        remappings=remappings)
+                     'robot_description': robot_description,
+                     'frame_prefix': PythonExpression(expression=["'", namespace, "' + '/'"])}],
+        # remappings=remappings
+    )
 
     start_gazebo_spawner_cmd = Node(
         package='gazebo_ros',
@@ -190,7 +192,7 @@ def generate_launch_description():
         output='screen',
         arguments=[
             '-entity', robot_name,
-            '-file', robot_sdf,
+            '-file', PythonExpression(expression=["'", robot_sdf, "' + '.' + '", namespace, "' + '.model'"]),
             '-robot_namespace', namespace,
             '-x', pose['x'], '-y', pose['y'], '-z', pose['z'],
             '-R', pose['R'], '-P', pose['P'], '-Y', pose['Y']])
