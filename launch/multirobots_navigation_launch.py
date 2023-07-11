@@ -207,6 +207,9 @@ def generate_launch_description():
     ld.add_action(declare_use_robot_state_pub_cmd)
 
     # Add the actions to start gazebo, robots and simulations
+    ld.add_action(IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(os.path.join(launch_dir, 'costmap_filter_info_launch.py')),
+            launch_arguments={}))
     ld.add_action(start_gazebo_cmd)
     ld.add_action(rviz_cmd)
 
