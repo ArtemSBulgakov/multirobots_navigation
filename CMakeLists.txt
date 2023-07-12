@@ -13,6 +13,7 @@ nav2_package()
 ament_python_install_package(${PROJECT_NAME})
 install(PROGRAMS
   multirobots_navigation/remapper.py
+  multirobots_navigation/navigate_to_random_pose.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
