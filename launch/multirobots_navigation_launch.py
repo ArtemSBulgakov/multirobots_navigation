@@ -194,6 +194,12 @@ def generate_launch_description():
         arguments=["--frame-id", "map", "--child-frame-id", "odom", "--x", "0", "--y", "0", "--z", "0", "--roll", "0", "--pitch", "0", "--yaw", "0"]
     ))
 
+    ld.add_action(Node(
+        package="multirobots_navigation",
+        executable="initialize_pose.py",
+        output="screen" ,
+    ))
+
 
     # Declare the launch options
     ld.add_action(declare_simulator_cmd)
